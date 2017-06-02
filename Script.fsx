@@ -5,15 +5,15 @@
    |first::rest-> first+addIntegers rest
 let sprintArray (arr:int[])=
     let error=""
-    arr|>Array.fold(fun acc elem-> match acc with |""->elem.ToString() |_->acc+elem.ToString()) error
+    arr|>Array.fold(fun acc elem-> match acc with |""->elem.ToString() |_->acc+","+elem.ToString()) error
 let addTwoNumbers (text:string) d=
    let numbers= match text with
     |""->[0]
     |_->
-        let integers=text.Split[|d;'\n'|]|>Array.map System.Int32.Parse 
+        let integers=text.Split[|d;'\n'|]|>Array.map System.Int32.Parse |>Array.filter(fun n->n<1000)
         let negative=Array.filter(fun n-> n<0) integers
         match negative with
-        |[||]->negative|>Array.toList
+        |[||]->integers|>Array.toList
         |_-> failwith(sprintf "negative not allowed %s" (sprintArray negative))
    addIntegers numbers
 
@@ -23,6 +23,5 @@ let first (text:string)=
         |_->(';',text)
    addTwoNumbers text' d
 
-let text="1;2;3;4"
-let n=[|1,2,3,4,5|]
+let text="//,\n1,22,3,1000"
 first text
