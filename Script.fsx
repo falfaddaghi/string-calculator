@@ -43,19 +43,17 @@ let first (text : string) =
         | _ -> (";", text)
     d
 
-let rec split (text : string) l (d:string)  = 
+let rec split (text : string)  (d:string)  = 
     let myNumbers = 
         match text with
         | "" -> []
         | _ -> 
             let index=text.IndexOf(d)
             match index with 
-            |(-1)->l@[text]
+            |(-1)->[text]
             |_->
                 let number = text.Substring(0,index)
-                let numberListL = l @ [number]
-                let numberListR = split (text.Substring(index+d.Length)) l d
-                numberListL @ numberListR
+                [number]@ split (text.Substring(index+d.Length))  d
     myNumbers
 
 let rec getDilimeterList (text:string) =
@@ -86,5 +84,5 @@ t3.IndexOf("\n")
 t3.Substring(2,3)
 getDilimeters  t3
 t3.ToCharArray()|>Array.toList
-split t4 [] ",,"
+split t4  ",,,"
 first t3
