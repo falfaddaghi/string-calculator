@@ -43,46 +43,51 @@ let first (text : string) =
         | _ -> (";", text)
     d
 
-let rec split (text : string)  (d:string)  = 
+let validIndex (dIndex:string*int)=
+    let d,index=dIndex
+    index<>(-1)
+let indexKey dIndex=
+    let d,index=dIndex
+    index
+    
+let rec split (text : string)  (d:List<string>)  = 
     let myNumbers = 
         match text with
         | "" -> []
         | _ -> 
-            let index=text.IndexOf(d)
-            match index with 
-            |(-1)->[text]
-            |_->
+            let indexies= List.map(fun (x:string)-> x,text.IndexOf(x)) d|>List.filter validIndex|>List.sortBy indexKey
+            match indexies with 
+            |[]->[text]
+            |(delimiter,index)::rest->
                 let number = text.Substring(0,index)
-                [number]@ split (text.Substring(index+d.Length))  d
+                [number]@ split (text.Substring(index+delimiter.Length))  d
     myNumbers
 
-let rec getDilimeterList (text:string) =
+let rec getdelimiterList (text:string) =
     match text with
         |""->[]
         | text when text.StartsWith("[")->
             let index=text.IndexOf(']')
             let d=text.Substring(1,index-1)
-            [d]@getDilimeterList (text.Substring(index+1))
+            [d]@getdelimiterList (text.Substring(index+1))
         |_->failwith("invalid dilemeter")
 
-let getDilimeters (text:string)=
-    let dilimeterList=
+let getdelimitersWithText (text:string)=
+    let newLineIndex=text.IndexOf("\n")
+    let delimiterList=
         if text.StartsWith("//") then
-           text.Substring(2,text.IndexOf("\n")-2) |>getDilimeterList
+           text.Substring(2,newLineIndex-2) |>getdelimiterList
         else
             [","]
-    dilimeterList
+    (delimiterList,text.Substring(newLineIndex+1))
 
 
     
-let text = "//*\n2*22*3****1000"
 let t1 = "1,2"
 let t2 = "1,2\n3"
-let t3 = "//[;;][**]\n1;2;3"
-let t4="1,,,2,,,3,,,4"
-t3.IndexOf("\n")
+let t3 = "//[;][**]\n1;2**3"
+let t4="1,,,2;3,,,4"
+let t5="1,2;3;4"
 t3.Substring(2,3)
-getDilimeters  t3
-t3.ToCharArray()|>Array.toList
-split t4  ",,,"
-first t3
+let d,text=getdelimitersWithText  t3
+let numbers=split text d |>List.map System.Int32.Parse|>List.sum
